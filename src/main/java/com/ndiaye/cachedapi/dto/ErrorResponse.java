@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookResponseDto {
+public class ErrorResponse {
 
-    private String title;
-    private String author;
-    private int year;
-    private String country;
+    private int code;
+    private String message;
+    private Date date;
 }

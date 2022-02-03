@@ -13,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,11 +34,16 @@ public class BookServiceImpl implements BookService {
         this.bookRepository = bookRepository;
     }
 
-    @Cacheable("books")
+    @Cacheable("allBooks")
     @Override
-    public List<Book> getAllBooks() {
+    public List<BookResponseDto> getAllBooks() {
         log.info("Called 'getAllBooks' from BookService");
-        return bookRepository.findAll();
+        List<Book> bookList = bookRepository.findAll();
+        List<BookResponseDto> bookResponseDtoList = new ArrayList<>();
+        for (Book b : bookList) {
+            bookResponseDtoList.add(bookToBookResponseDto(b));
+        }
+        return bookResponseDtoList;
     }
 
     @Cacheable(value = "books", key = "#id")
@@ -47,7 +54,8 @@ public class BookServiceImpl implements BookService {
         return bookToBookResponseDto(retrievedBook);
     }
 
-    @CachePut(value = "books", key = "#id")
+    @Caching(evict = { @CacheEvict(value = "allBooks", allEntries = true)
+            }, put = { @CachePut(value = "books", key = "#id") })
     @Override
     public BookResponseDto updateBook(Long id, UpdateBookDto updateBookDto) {
         log.info("Called 'updateBook' from BookService => id : " + id);
@@ -58,7 +66,7 @@ public class BookServiceImpl implements BookService {
         return bookToBookResponseDto(retrievedBook);
     }
 
-    @CacheEvict(value = "books", key = "#id")
+    @Caching(evict = { @CacheEvict(value = "allBooks", allEntries = true), @CacheEvict(value = "books", key = "#id")})
     @Override
     public void deleteBookById(Long id) {
         log.info("Called 'deleteBookById' from BookService => id : " + id);
@@ -66,12 +74,13 @@ public class BookServiceImpl implements BookService {
         bookRepository.delete(retrievedBook);
     }
 
-    @CacheEvict(value = "books", allEntries = true)
+    @Caching(evict = { @CacheEvict(value = "allBooks", allEntries = true), @CacheEvict(value = "books", allEntries = true)})
     @Override
     public void deleteAllBooks() {
         bookRepository.deleteAll();
     }
 
+    @CacheEvict(value = "allBooks", allEntries = true)
     @Override
     public BookResponseDto createBook(CreateBookDto createBookDto) {
         String title = createBookDto.getTitle();
@@ -99,7 +108,7 @@ public class BookServiceImpl implements BookService {
     private BookResponseDto bookToBookResponseDto(Book b)
     {
         BookResponseDto book = new BookResponseDto();
-        book.setId(b.getId());
+        book.setCountry(b.getCountry());
         book.setTitle(b.getTitle());
         book.setAuthor(b.getAuthor());
         book.setYear(b.getYear());

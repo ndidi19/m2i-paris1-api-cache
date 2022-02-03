@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -24,13 +25,13 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public List<Book> getAllBooks() {
+    public List<BookResponseDto> getAllBooks() {
         log.info("Called 'getAllBooks' from BookController");
         return bookService.getAllBooks();
     }
 
     @PostMapping("/books")
-    public BookResponseDto createBook(@RequestBody CreateBookDto createBookDto) {
+    public BookResponseDto createBook(@Valid @RequestBody CreateBookDto createBookDto) {
         return bookService.createBook(createBookDto);
     }
 
@@ -41,7 +42,7 @@ public class BookController {
     }
 
     @PutMapping("/books/{id}")
-    public BookResponseDto updateBookById(@PathVariable Long id, @RequestBody UpdateBookDto updateBookDto) {
+    public BookResponseDto updateBookById(@PathVariable Long id, @Valid @RequestBody UpdateBookDto updateBookDto) {
         return bookService.updateBook(id, updateBookDto);
     }
 
