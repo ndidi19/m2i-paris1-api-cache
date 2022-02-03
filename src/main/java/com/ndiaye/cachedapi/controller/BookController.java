@@ -1,6 +1,7 @@
 package com.ndiaye.cachedapi.controller;
 
 import com.ndiaye.cachedapi.dto.BookResponseDto;
+import com.ndiaye.cachedapi.dto.CreateBookDto;
 import com.ndiaye.cachedapi.dto.UpdateBookDto;
 import com.ndiaye.cachedapi.entity.Book;
 import com.ndiaye.cachedapi.service.BookService;
@@ -28,6 +29,11 @@ public class BookController {
         return bookService.getAllBooks();
     }
 
+    @PostMapping("/books")
+    public BookResponseDto createBook(@RequestBody CreateBookDto createBookDto) {
+        return bookService.createBook(createBookDto);
+    }
+
     @GetMapping("/books/{id}")
     public BookResponseDto getBookById(@PathVariable Long id) {
         log.info("Called 'getBookById' from BookController => id : " + id);
@@ -38,4 +44,14 @@ public class BookController {
     public BookResponseDto updateBookById(@PathVariable Long id, @RequestBody UpdateBookDto updateBookDto) {
         return bookService.updateBook(id, updateBookDto);
     }
+
+    @DeleteMapping("/books/{id}")
+    public void deleteBookById(@PathVariable Long id) {
+        bookService.deleteBookById(id);
+    }
+    @DeleteMapping("/ books")
+    public void deleteAllBooks() {
+        bookService.deleteAllBooks();
+    }
+
 }
